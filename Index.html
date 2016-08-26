@@ -33,16 +33,13 @@
                 var mySR = new esri.SpatialReference({
                     wkid: 102100
                 });
-                var initExtent = new esri.geometry.Extent(15427083.0, -4155574.0, 1548000.0, -4152803.0, mySR);
+                var initExtent = new esri.geometry.Extent(15427083.177036194, -4155574.3822912886, 15431215.55387797, -4152803.5400158777, mySR);
                 map1 = new esri.Map("mapDiv", {
                     extent: initExtent
                 });
-                
-                # orginal Adelaide extent - Line 36 -  15427083.177036194, -4155574.3822912886, 15431215.55387797, -4152803.5400158777
-                
-                var parisExtent = [260000.0, 6249392.0, 262460.0, 6250777.0];
+  
+                var parisExtent = [260714.17175416223, 6249392.501531891, 262460.28011909773, 6250777.922669596];
 	
-		# orginal Paris extent - Line 43 - 260714.17175416223, 6249392.501531891, 262460.28011909773, 6250777.922669596
 								
                 parisOffset = {
                 	'xmin': 15166369.00528203, 
