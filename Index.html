@@ -1,0 +1,145 @@
+<html>
+    
+    <head>
+        <title>Sync</title>
+        <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/dojo/dijit/themes/claro/claro.css">
+        <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css" />
+        <script type="text/javascript">
+            djConfig = {
+                parseOnLoad: true
+            };
+        </script>
+        <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.5/"></script>
+        <script type="text/javascript">
+            dojo.require("esri.map");
+
+            var layer11, layer12, layer21, layer22;
+            var map1, map2;
+            var parisOffset;
+
+            function init() {
+                var url1 = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer";
+                var url2 = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
+
+                layer11 = new esri.layers.ArcGISTiledMapServiceLayer(url1);
+                layer12 = new esri.layers.ArcGISTiledMapServiceLayer(url2);
+                layer21 = new esri.layers.ArcGISTiledMapServiceLayer(url1);
+                layer22 = new esri.layers.ArcGISTiledMapServiceLayer(url2);
+                layer11.setVisibility(false);
+                layer12.setVisibility(true);
+                layer21.setVisibility(false);
+                layer22.setVisibility(true);
+
+                var mySR = new esri.SpatialReference({
+                    wkid: 102100
+                });
+                var initExtent = new esri.geometry.Extent(15427083.177036194, -4155574.3822912886, 15431215.55387797, -4152803.5400158777, mySR);
+                map1 = new esri.Map("mapDiv", {
+                    extent: initExtent
+                });
+                
+                var parisExtent = [260714.17175416223, 6249392.501531891, 262460.28011909773, 6250777.922669596];
+								
+                parisOffset = {
+                	'xmin': 15166369.00528203, 
+                  'ymin': -10404966.88382318, 
+                  'xmax': 15168755.27375887, 
+                  'ymax': -10403581.46268547
+                }
+                
+                map1.addLayer(layer11);
+                map1.addLayer(layer12);
+                dojo.connect(map1, 'onExtentChange', onExtentChange);
+                dojo.connect(map1, 'onPan', onPan);
+
+                map2 = new esri.Map("buttonDiv", {
+                    extent: initExtent,
+                    logo: false
+                });
+
+                dojo.connect(map2, 'onClick', changeBack);
+                dojo.connect(map2, 'onLayerAdd', afterLoad2);
+              	map2.addLayer(layer21);
+                map2.addLayer(layer22);
+                esriConfig.defaults.map.panDuration = 0;
+                //esriConfig.defaults.map.zoomDuration = 0;
+                changeBack();
+            }
+
+            function afterLoad2() {
+                map2.hideZoomSlider();
+                map1.disableClickRecenter();
+                map2.disableClickRecenter();
+                map2.disableDoubleClickZoom();
+                map2.disableKeyboardNavigation();
+                map2.disableMapNavigation();
+                map2.disablePan();
+                map2.disableRubberBandZoom();
+                map2.disableScrollWheelZoom();
+                map2.disableShiftDoubleClickZoom();
+                map2.disableSnapping();
+                map2.setMapCursor("pointer");
+            }
+
+            function onPan(extent, delta) {
+                updateMap2Extent(extent);
+            }
+
+            function onExtentChange(extent) {
+                updateMap2Extent(extent);
+                console.log(extent);
+            }
+
+            function updateMap2Extent(extent1) {
+                var w = map1.width;
+                var h = map1.height;
+                var xmin = extent1.xmin - parisOffset.xmin;
+                var xmax = extent1.xmax - parisOffset.xmax;
+                var ymin = extent1.ymin - parisOffset.ymin;
+                var ymax = extent1.ymax - parisOffset.ymax;
+                var mySR = new esri.SpatialReference({
+                    wkid: 102100
+                });
+
+                var extent2 = new esri.geometry.Extent(xmin, ymin, xmax, ymax, mySR);
+                map2.setExtent(extent2);
+                map2.hideZoomSlider(); //sometimes
+            }
+
+            function changeBack() {
+                layer11.setVisibility(!layer11.visible);
+                layer12.setVisibility(!layer12.visible);
+                layer21.setVisibility(!layer21.visible);
+                layer22.setVisibility(!layer22.visible);
+            }
+            dojo.addOnLoad(init);
+        </script>
+    </head>
+	
+	<style>
+	html, body, #mapDiv, .map.container {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+#buttonDiv {
+    position: absolute;
+    background-color: White;
+    right: 10px;
+    top: 10px;
+    color: #700;
+    z-index: 11150;
+    font-size: large;
+    width:200px;
+    height:200px;
+    border:2px solid blue;
+    opacity:1.0;
+}
+	</style>
+    
+    <body class="claro">
+        <div id="mapDiv"></div>
+        <div id="buttonDiv" />
+    </body>
+
+</html>
